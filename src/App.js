@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './styles/App.css';
 import { FormControl, Select, MenuItem } from '@material-ui/core'
 import InfoBox from './components/InfoBox'
+import Map from './components/Map'
+import "leaflet/dist/leaflet.css"
 
 
 
@@ -58,9 +60,9 @@ const onCountryChange = async (e) => {
 
       {/*InfoBox*/}
         <div className="app__stats">
-          <InfoBox title='CoronaVirus Cases' />
-          <InfoBox title='Recovered' />
-          <InfoBox title='Deaths' />
+          <InfoBox title='CoronaVirus Cases' cases={123} total={123} />
+          <InfoBox title='Recovered' cases={123} total={123} />
+          <InfoBox title='Deaths' cases={123} total={123} />
         </div>
 
       {/*Table*/}
@@ -68,6 +70,7 @@ const onCountryChange = async (e) => {
       {/*Graph*/}
 
       {/*Map*/}
+      <Map />
     </div>
   );
 }
