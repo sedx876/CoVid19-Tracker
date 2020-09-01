@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './styles/App.css';
 import { FormControl, Select, MenuItem } from '@material-ui/core'
 
 function App() {
+const [countries, setCountries] = useState([])
+// https://disease.sh/v3/covid-19/countries
+
+useEffect(() => {
+  const getCountriesData = async () => {
+    await fetch('https://disease.sh/v3/covid-19/countries')
+    .then((response) => response.json())
+    .then((data) => {
+      const countries = data.map((country) => (
+        {
+          name: country.country,
+          value: country.countryInfo.iso2,
+        }
+      ))
+      setCountries(countries)
+    })
+  }
+  getCountriesData()
+}, [])
+
   return (
     <div className="app">
     {/*Header */}
@@ -12,10 +32,13 @@ function App() {
     {/*Title + Select Dropdown Field */}
       <FormControl className="app__dropdown">
         <Select variant="outlined" value="abc">
-          <MenuItem value="worldwide">WorldWide</MenuItem>
+        { countries.map((country) => (
+          <MenuItem value={country.value}>{country.name}</MenuItem>
+        ))}
+          {/* <MenuItem value="worldwide">WorldWide</MenuItem>
           <MenuItem value="worldwide">Option 1</MenuItem>
           <MenuItem value="worldwide">Option 2</MenuItem>
-          <MenuItem value="worldwide">Option 3</MenuItem>
+          <MenuItem value="worldwide">Option 3</MenuItem> */}
         </Select>
       </FormControl>
       </div>
