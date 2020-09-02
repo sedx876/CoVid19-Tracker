@@ -6,14 +6,20 @@ import Map from './components/Map'
 import "leaflet/dist/leaflet.css"
 import Table from './components/Table'
 import { sortData } from './components/util'
+import LineGraph from './components/LineGraph'
+import numeral from "numeral";
 
 
 
 function App() {
-const [countries, setCountries] = useState([])
-const [country, setCountry] = useState('worldwide')
-const [countryInfo, setCountryInfo] = useState({})
-const [tableData, setTableData] = useState([])
+  const [country, setInputCountry] = useState("worldwide");
+  const [countryInfo, setCountryInfo] = useState({});
+  const [countries, setCountries] = useState([]);
+  const [mapCountries, setMapCountries] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [casesType, setCasesType] = useState("cases");
+  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
+  const [mapZoom, setMapZoom] = useState(3);
 
 
 useEffect(() => {
@@ -28,22 +34,22 @@ useEffect(() => {
 
 useEffect(() => {
   const getCountriesData = async () => {
-    await fetch('https://disease.sh/v3/covid-19/countries')
-    .then((response) => response.json())
-    .then((data) => {
-      const countries = data.map((country) => (
-        {
+    fetch("https://disease.sh/v3/covid-19/countries")
+      .then((response) => response.json())
+      .then((data) => {
+        const countries = data.map((country) => ({
           name: country.country,
           value: country.countryInfo.iso2,
-        }
-      ))
-      const sortedData = sortData(data)
-      setTableData(sortedData)
-      setCountries(countries)
-    })
-  }
-  getCountriesData()
-}, [])
+        }));
+        let sortedData = sortData(data);
+        setCountries(countries);
+        setMapCountries(data);
+        setTableData(sortedData);
+      });
+  };
+
+  getCountriesData();
+}, []);
 
 const onCountryChange = async (e) => {
   const countryCode = e.target.value
@@ -55,11 +61,10 @@ const onCountryChange = async (e) => {
   await fetch(url)
   .then((response) => response.json())
   .then((data) => {
-    //setInputCountry(countryCode);
-    setCountry(countryCode);
+    setInputCountry(countryCode);
     setCountryInfo(data);
-    //setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
-    //setMapZoom(4);
+    setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+    setMapZoom(4);
   })
 
   
@@ -94,7 +99,11 @@ const onCountryChange = async (e) => {
 
 
       {/*Map*/}
-      <Map />
+      <Map 
+        countries={mapCountries}
+        casesType={casesType}
+        center={mapCenter}
+        zoom={mapZoom} />
       </div>
       <Card className="app__right">
         <CardContent>
@@ -102,6 +111,7 @@ const onCountryChange = async (e) => {
             <h3>Live Cases by Country</h3>
             <Table countries={tableData}/>
             <h3>WorldWide New Cases</h3>
+            <LineGraph casesType={casesType}/>
           </div>
         </CardContent>
       </Card>
