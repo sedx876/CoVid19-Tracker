@@ -5,6 +5,7 @@ import InfoBox from './components/InfoBox'
 import Map from './components/Map'
 import "leaflet/dist/leaflet.css"
 import Table from './components/Table'
+import { sortData } from './components/util'
 
 
 
@@ -36,7 +37,8 @@ useEffect(() => {
           value: country.countryInfo.iso2,
         }
       ))
-      setTableData(data)
+      const sortedData = sortData(data)
+      setTableData(sortedData)
       setCountries(countries)
     })
   }
