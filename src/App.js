@@ -5,7 +5,7 @@ import InfoBox from './components/InfoBox'
 import Map from './components/Map'
 import "leaflet/dist/leaflet.css"
 import Table from './components/Table'
-import { sortData } from './components/util'
+import { sortData, prettyPrintStat } from './components/util'
 import LineGraph from './components/LineGraph'
 import numeral from "numeral";
 
@@ -62,9 +62,14 @@ const onCountryChange = async (e) => {
   .then((response) => response.json())
   .then((data) => {
     setInputCountry(countryCode);
-    setCountryInfo(data);
-    setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
-    setMapZoom(4);
+    setCountryInfo(data)
+    if(countryCode === 'worldwide'){
+      setMapCenter(mapCenter);
+      setMapZoom(mapZoom);
+    } else {
+      setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+      setMapZoom(4);
+    };
   })
 
   
@@ -92,9 +97,23 @@ const onCountryChange = async (e) => {
 
       {/*InfoBox*/}
         <div className="app__stats">
-          <InfoBox title='CoronaVirus Cases' cases={countryInfo.todayCases} total={countryInfo.cases} />
-          <InfoBox title='Recovered' cases={countryInfo.todayRecovered} total={countryInfo.recovered} />
-          <InfoBox title='Deaths' cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
+          <InfoBox onClick={(e) => setCasesType("cases")}
+            title="Coronavirus Cases"
+            isRed
+            active={casesType === "cases"}
+            cases={prettyPrintStat(countryInfo.todayCases)}
+            total={numeral(countryInfo.cases).format("0.0a")} />
+          <InfoBox onClick={(e) => setCasesType("recovered")}
+            title="Recovered"
+            active={casesType === "recovered"}
+            cases={prettyPrintStat(countryInfo.todayRecovered)}
+            total={numeral(countryInfo.recovered).format("0.0a")} />
+          <InfoBox onClick={(e) => setCasesType("deaths")}
+            title="Deaths"
+            isRed
+            active={casesType === "deaths"}
+            cases={prettyPrintStat(countryInfo.todayDeaths)}
+            total={numeral(countryInfo.deaths).format("0.0a")} />
         </div>
 
 
